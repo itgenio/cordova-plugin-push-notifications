@@ -1,7 +1,8 @@
 package notifications
 
 import android.util.Log
-import com.google.firebase.iid.FirebaseInstanceId
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import org.apache.cordova.CallbackContext
 import org.apache.cordova.CordovaPlugin
 import org.json.JSONArray
@@ -57,11 +58,15 @@ class Notifications: CordovaPlugin() {
   }
 
   private fun getFirebaseToken(context: CallbackContext) {
-    FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener { instanceIdResult ->
-      val token = instanceIdResult.token
-      Log.d("FIREBASE TOKEN", token)
-      context.success(token)
-    }
+    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+        if (!task.isSuccessful) {
+            Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+            return@OnCompleteListener
+        }
+        val token = task.result
+        context.success(token)
+        Log.d(TAG, token)
+    })
   }
 
   private fun handleError(errorMsg: String, context: CallbackContext) {
