@@ -75,7 +75,7 @@
             <uses-permission android:name="android.permission.VIBRATE" />
             <uses-permission android:name="${applicationId}.permission.PushHandlerActivity" />
             <!-- Target SDK 33 -->
-            <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> 
+            <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
             <permission android:name="${applicationId}.permission.PushHandlerActivity"
                 android:protectionLevel="signature"></permission>
         </config-file>
@@ -85,7 +85,7 @@
         <source-file src="src/android/build-extras.gradle" target-dir="." />
 
         <framework src="com.google.gms:google-services:4.3.14" />
-        <framework src="com.google.firebase:firebase-messaging:20.0.1" />
+        <framework src="com.google.firebase:firebase-messaging:23.1.2" />
 
         <hook src="hooks/android/configureProjectLevelDependency.js" type="before_build" />
         <hook src="hooks/android/configureProjectLevelDependency.js" type="before_plugin_add" />
