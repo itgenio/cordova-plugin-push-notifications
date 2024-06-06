@@ -1,5 +1,6 @@
 package notifications
 
+import android.app.ActivityManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -86,8 +87,16 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
   override fun onMessageReceived(p0: RemoteMessage) {
     super.onMessageReceived(p0)
 
-    if (p0 != null) {
-      sendNotification(p0)
+    val isVisible = isForeground()
+
+    if (isVisible) {
+      Log.i(TAG, "App is foreground - skip sending message")
+    } else {
+      Log.i(TAG, "App is background - sending message")
+
+      if (p0 !== null) {
+        sendNotification(p0)
+      }
     }
   }
 
@@ -97,7 +106,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
     val body      =data["body"]
     val payload   =data["payload"]
     val large_icon  =data["large_icon"] // add large icon
-    val image      =data["image"] // add image 
+    val image      =data["image"] // add image
     val notification_id = data["id"] // add notification_id
     var channel_id=data["channel_id"]
 
@@ -148,6 +157,14 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
     }
   }
 
+  private fun isForeground(): Boolean {
+    val appProcessInfo = ActivityManager.RunningAppProcessInfo()
+    ActivityManager.getMyMemoryState(appProcessInfo)
+
+    val importance = appProcessInfo.importance
+
+    return importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND || importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE
+  }
 
   private fun getBitmapFromURL(strURL: String?): Bitmap? {
     return try {
