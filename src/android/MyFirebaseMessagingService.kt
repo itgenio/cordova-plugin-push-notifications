@@ -109,6 +109,8 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
       resultIntent.putExtra("pushNotification", payload)
     }
 
+
+    
     if(channel_id==null){
       channel_id=defaultNotificationChannelID
     }
@@ -137,10 +139,12 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
     if (large_icon != null) {
       notificationBuilder.setLargeIcon(getBitmapFromURL(large_icon))
     }
-
-    if (image != null) {
-      notificationBuilder.setStyle(NotificationCompat.BigPictureStyle().bigPicture(getBitmapFromURL(image)).bigLargeIcon(null))
-    }
+if (image != null) {
+  notificationBuilder.setStyle(
+    NotificationCompat.BigPictureStyle()
+      .bigPicture(getBitmapFromURL(image))
+  )
+}
 
     with(NotificationManagerCompat.from(this)) {
       val notificationId = notification_id?.toInt() ?: 0
