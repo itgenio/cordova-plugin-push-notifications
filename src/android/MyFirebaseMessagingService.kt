@@ -30,8 +30,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     
     companion object {
         private const val TAG = "FCMService"
-        private const val DEFAULT_CHANNEL_ID = "444"
-        private const val HIGH_PRIORITY_CHANNEL_ID = "high_priority"
+        private const val DEFAULT_CHANNEL_ID = "123"
+        private const val HIGH_PRIORITY_CHANNEL_ID = "234"
         private const val CONNECT_TIMEOUT = 15000
         private const val READ_TIMEOUT = 15000
     }
@@ -192,16 +192,25 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             null
         }
 
-        // Build notification
+        // Build notification mit dynamischer Priority basierend auf Channel
+        val priority = if (channelId == HIGH_PRIORITY_CHANNEL_ID) {
+            NotificationCompat.PRIORITY_MAX
+        } else {
+            NotificationCompat.PRIORITY_HIGH
+        }
+        
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(defaultNotificationIcon)
             .setContentTitle(title)
             .setContentText(body)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setPriority(priority)  // ← Dynamische Priority
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)  // ← Wichtig für Heads-Up
             .setAutoCancel(true)
             .setContentIntent(resultPendingIntent)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
-            .setVibrate(longArrayOf(0, 250, 250, 250))
+            .setVibrate(longArrayOf(0, 500, 250, 500))  // ← Längere Vibration
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)  // ← Auf Lockscreen
+            .setFullScreenIntent(resultPendingIntent, true)  // ← Erzwinge Heads-Up!
 
         // Set color if available
         if (defaultNotificationColor != 0) {
