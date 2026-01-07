@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-push-notifications" version="1.1.8" xmlns="http://apache.org/cordova/ns/plugins/1.0"
+<plugin id="cordova-plugin-push-notifications" version="1.2.0" xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <name>cordova-plugin-push-notifications</name>
     <js-module name="PushNotification" src="www/PushNotification.js">
         <clobbers target="pushNotification" />
     </js-module>
     <engines>
-        <engine name="cordova" version=">=9.0.0" />
-        <engine name="cordova-android" version=">=11.0.0" />
-        <engine name="cordova-ios" version=">=5.0.0" />
+        <engine name="cordova" version=">=12.0.0" />
+        <engine name="cordova-android" version=">=13.0.0" />
+        <engine name="cordova-ios" version=">=7.0.0" />
     </engines>
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
@@ -20,9 +20,6 @@
         <source-file src="src/ios/PushNotification.swift" />
 
         <dependency id="cordova-plugin-add-swift-support" version="2.0.2" />
-
-<!-- Activate Pushnotification and Remote notification -->
-
 
         <config-file target="*-Info.plist" parent="UIBackgroundModes">
             <array>
@@ -41,14 +38,15 @@
         <config-file target="*-Release.plist" parent="com.apple.developer.aps-environment">
             <string>production</string>
         </config-file>
-
     </platform>
+
     <platform name="android">
         <config-file target="config.xml" parent="/*">
             <preference name="GradlePluginKotlinEnabled" value="true" />
             <preference name="GradlePluginGoogleServicesEnabled" value="true" />
             <preference name="GradlePluginKotlinCodeStyle" value="official" />
-            <preference name="GradlePluginKotlinVersion" value="1.6.20" />
+            <preference name="GradlePluginKotlinVersion" value="1.9.24" />
+            <preference name="AndroidXEnabled" value="true" />
 
             <feature name="PushNotification">
                 <param name="android-package" value="notifications.Notifications" />
@@ -58,15 +56,14 @@
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id"
                 android:value="444" />
-            <service android:name="notifications.MyFirebaseMessagingService" android:exported="false">
+            <service android:name="notifications.MyFirebaseMessagingService"
+                android:exported="false"
+                android:foregroundServiceType="dataSync">
                 <intent-filter>
                     <action android:name="com.google.firebase.MESSAGING_EVENT" />
                 </intent-filter>
             </service>
         </config-file>
-
-
-<!-- Ask for permission  -->
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.INTERNET" />
@@ -74,8 +71,12 @@
             <uses-permission android:name="android.permission.WAKE_LOCK" />
             <uses-permission android:name="android.permission.VIBRATE" />
             <uses-permission android:name="${applicationId}.permission.PushHandlerActivity" />
-            <!-- Target SDK 33 -->
+            <!-- Target SDK 33+ -->
             <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+            <!-- Target SDK 34+ -->
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
             <permission android:name="${applicationId}.permission.PushHandlerActivity"
                 android:protectionLevel="signature"></permission>
         </config-file>
@@ -84,8 +85,8 @@
         <source-file src="src/android/MyFirebaseMessagingService.kt" target-dir="src/main/kotlin/notifications" />
         <source-file src="src/android/build-extras.gradle" target-dir="." />
 
-        <framework src="com.google.gms:google-services:4.3.14" />
-        <framework src="com.google.firebase:firebase-messaging:23.1.2" />
+        <framework src="com.google.gms:google-services:4.4.2" />
+        <framework src="com.google.firebase:firebase-messaging:24.0.3" />
 
         <hook src="hooks/android/configureProjectLevelDependency.js" type="before_build" />
         <hook src="hooks/android/configureProjectLevelDependency.js" type="before_plugin_add" />

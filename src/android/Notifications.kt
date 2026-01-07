@@ -59,13 +59,16 @@ class Notifications: CordovaPlugin() {
 
   private fun getFirebaseToken(context: CallbackContext) {
     FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-        if (!task.isSuccessful) {
-            Log.w(TAG, "Fetching FCM registration token failed", task.exception)
-            return@OnCompleteListener
-        }
-        val token = task.result
-        context.success(token)
-        Log.d(TAG, token)
+      if (!task.isSuccessful) {
+        Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+        context.error("Failed to get FCM token: ${task.exception?.message}")
+        return@OnCompleteListener
+      }
+
+      // Get new FCM registration token
+      val token = task.result
+      Log.d(TAG, "FCM Token: $token")
+      context.success(token)
     })
   }
 

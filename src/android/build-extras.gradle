@@ -1,9 +1,11 @@
 apply plugin: 'com.google.gms.google-services'
 
 dependencies {
-  implementation platform('com.google.firebase:firebase-bom:32.2.2')
+  implementation platform('com.google.firebase:firebase-bom:33.7.0')
   implementation 'com.google.firebase:firebase-messaging'
   implementation 'com.google.firebase:firebase-analytics'
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1'
 }
 
 android {
@@ -12,4 +14,15 @@ android {
       srcDirs += 'src/main/kotlin'
     }
   }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
+
+  kotlinOptions {
+    jvmTarget = "17"
+  }
+
+  namespace 'com.yourcompany.notifications'
 }
