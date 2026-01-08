@@ -84,20 +84,20 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val defaultChannel = NotificationChannel(
                 defaultNotificationChannelID,
-                "Standard Benachrichtigungen",
+                "Standard notifications",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Allgemeine Push-Benachrichtigungen"
+                description = "General push notifications"
                 enableVibration(true)
                 enableLights(true)
             }
 
             val highPriorityChannel = NotificationChannel(
                 HIGH_PRIORITY_CHANNEL_ID,
-                "Wichtige Benachrichtigungen",
+                "Important notifications",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Hochprioritäre Benachrichtigungen"
+                description = "High-priority notifications"
                 enableVibration(true)
                 enableLights(true)
                 setShowBadge(true)
@@ -123,12 +123,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         } else {
             Log.i(TAG, "App is background - sending message")
 
-            // WICHTIG: Verarbeite immer die data payload, unabhängig vom notification Feld
+            // IMPORTANT: Always process the data payload, regardless of the notification field.
             if (remoteMessage.data.isNotEmpty()) {
                 handleDataPayload(remoteMessage.data)
             }
 
-            // Falls auch ein notification Feld vorhanden ist (sollte bei data_only=true nicht der Fall sein)
+            // If a notification field is also present (should not be the case with data_only=true)
             remoteMessage.notification?.let {
                 Log.d(TAG, "Notification payload: ${it.title} - ${it.body}")
             }
@@ -146,7 +146,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         Log.d(TAG, "Creating notification - Title: $title, Body: $body, ID: $notificationId")
 
-        // Lade Bilder asynchron im Hintergrund
+        // Loading images asynchronously in the background
         CoroutineScope(Dispatchers.IO).launch {
             val largeIconBitmap = largeIcon?.let { downloadBitmap(it) }
             val imageBitmap = image?.let { downloadBitmap(it) }
@@ -201,7 +201,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             null
         }
 
-        // Build notification mit dynamischer Priority basierend auf Channel
+        // Build notification with dynamic priority based on channel
         val priority = if (channelId == HIGH_PRIORITY_CHANNEL_ID) {
             NotificationCompat.PRIORITY_MAX
         } else {
@@ -212,14 +212,14 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setSmallIcon(defaultNotificationIcon)
             .setContentTitle(title)
             .setContentText(body)
-            .setPriority(priority)  // ← Dynamische Priority
-            .setCategory(NotificationCompat.CATEGORY_MESSAGE)  // ← Wichtig für Heads-Up
+            .setPriority(priority)  // ← Dynamic Priority
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)  // ← Important for Heads-Up
             .setAutoCancel(true)
             .setContentIntent(resultPendingIntent)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
-            .setVibrate(longArrayOf(0, 500, 250, 500))  // ← Längere Vibration
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)  // ← Auf Lockscreen
-            .setFullScreenIntent(resultPendingIntent, true)  // ← Erzwinge Heads-Up!
+            .setVibrate(longArrayOf(0, 500, 250, 500))  // ← Prolonged vibration
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)  // ← On lock screen
+            .setFullScreenIntent(resultPendingIntent, true)  // ← Force a heads-up!
 
         // Set color if available
         if (defaultNotificationColor != 0) {
@@ -314,7 +314,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         Log.d(TAG, "New FCM token: $token")
-        // TODO: Sende den neuen Token an deinen Server
+        // TODO: Send the new token to your server
         // sendTokenToServer(token)
     }
 

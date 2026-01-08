@@ -1,12 +1,12 @@
 # Cordova Push Notification plugin
 
 Simple plugin of Cordova for Push Notification in iOS and Android. You will be able to receive a device token using Google services (Firebase Cloud Messages) and Apple (Apple Push Notification) to send push notifications.
- - Working with Cordova 12 & Android TargetSDK 33
+ - Working with Cordova 12 & Android TargetSDK 35
 
 # Install
 
 ```bash
-cordova plugin add https://github.com/SimeonLukas/cordova-plugin-push-notifications.git
+cordova plugin add https://github.com/itgenio/cordova-plugin-push-notifications.git
 ```
 
 Or 
@@ -21,7 +21,7 @@ And follow the instructions...
 
 ## Cordova
 
-Required Cordova version >= 9.0.0
+Required Cordova version >= 12.0.0
 
 Check via:
 
@@ -31,14 +31,14 @@ cordova -v
 
 ## iOS
 
-Required Cordova iOS platform >= 5.0.0
+Required Cordova iOS platform >= 7.0.0
 
 After entering "plugin add" or "cordova build ios" command open iOS project in Xcode, go to Signing & Capabilities and click on "+" in left. Select Push Notification and generate SSL-certificate for push notification. You can check the instructions [here](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/establishing_a_certificate-based_connection_to_apns).
 
 
 ## Android
 
-Required Cordova Android platform >= 9.0.0
+Required Cordova Android platform >= 13.0.0
 
 After entering "plugin add" command, add new preference in config.xml of project:
 
