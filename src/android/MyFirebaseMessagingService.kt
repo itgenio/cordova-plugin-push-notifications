@@ -1,5 +1,6 @@
 package notifications
 
+import android.app.ActivityManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -27,7 +28,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
-    
+
     companion object {
         private const val TAG = "FCMService"
         private const val DEFAULT_CHANNEL_ID = "123"
@@ -83,20 +84,20 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val defaultChannel = NotificationChannel(
                 defaultNotificationChannelID,
-                "Standard Benachrichtigungen",
+                "Standard notifications",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Allgemeine Push-Benachrichtigungen"
+                description = "General push notifications"
                 enableVibration(true)
                 enableLights(true)
             }
 
             val highPriorityChannel = NotificationChannel(
                 HIGH_PRIORITY_CHANNEL_ID,
-                "Wichtige Benachrichtigungen",
+                "Important notifications",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Hochprioritäre Benachrichtigungen"
+                description = "High-priority notifications"
                 enableVibration(true)
                 enableLights(true)
                 setShowBadge(true)
@@ -111,18 +112,26 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        
+
         Log.d(TAG, "Message received from: ${remoteMessage.from}")
         Log.d(TAG, "Message data: ${remoteMessage.data}")
 
-        // WICHTIG: Verarbeite immer die data payload, unabhängig vom notification Feld
-        if (remoteMessage.data.isNotEmpty()) {
-            handleDataPayload(remoteMessage.data)
-        }
+        val isVisible = isForeground()
 
-        // Falls auch ein notification Feld vorhanden ist (sollte bei data_only=true nicht der Fall sein)
-        remoteMessage.notification?.let {
-            Log.d(TAG, "Notification payload: ${it.title} - ${it.body}")
+        if (isVisible) {
+            Log.i(TAG, "App is foreground - skip sending message")
+        } else {
+            Log.i(TAG, "App is background - sending message")
+
+            // IMPORTANT: Always process the data payload, regardless of the notification field.
+            if (remoteMessage.data.isNotEmpty()) {
+                handleDataPayload(remoteMessage.data)
+            }
+
+            // If a notification field is also present (should not be the case with data_only=true)
+            remoteMessage.notification?.let {
+                Log.d(TAG, "Notification payload: ${it.title} - ${it.body}")
+            }
         }
     }
 
@@ -137,7 +146,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         Log.d(TAG, "Creating notification - Title: $title, Body: $body, ID: $notificationId")
 
-        // Lade Bilder asynchron im Hintergrund
+        // Loading images asynchronously in the background
         CoroutineScope(Dispatchers.IO).launch {
             val largeIconBitmap = largeIcon?.let { downloadBitmap(it) }
             val imageBitmap = image?.let { downloadBitmap(it) }
@@ -192,25 +201,25 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             null
         }
 
-        // Build notification mit dynamischer Priority basierend auf Channel
+        // Build notification with dynamic priority based on channel
         val priority = if (channelId == HIGH_PRIORITY_CHANNEL_ID) {
             NotificationCompat.PRIORITY_MAX
         } else {
             NotificationCompat.PRIORITY_HIGH
         }
-        
+
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(defaultNotificationIcon)
             .setContentTitle(title)
             .setContentText(body)
-            .setPriority(priority)  // ← Dynamische Priority
-            .setCategory(NotificationCompat.CATEGORY_MESSAGE)  // ← Wichtig für Heads-Up
+            .setPriority(priority)  // ← Dynamic Priority
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)  // ← Important for Heads-Up
             .setAutoCancel(true)
             .setContentIntent(resultPendingIntent)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
-            .setVibrate(longArrayOf(0, 500, 250, 500))  // ← Längere Vibration
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)  // ← Auf Lockscreen
-            .setFullScreenIntent(resultPendingIntent, true)  // ← Erzwinge Heads-Up!
+            .setVibrate(longArrayOf(0, 500, 250, 500))  // ← Prolonged vibration
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)  // ← On lock screen
+            .setFullScreenIntent(resultPendingIntent, true)  // ← Force a heads-up!
 
         // Set color if available
         if (defaultNotificationColor != 0) {
@@ -246,7 +255,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         try {
             with(NotificationManagerCompat.from(this)) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) 
+                    if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
                         == PackageManager.PERMISSION_GRANTED) {
                         notify(notificationId, notificationBuilder.build())
                         Log.d(TAG, "Notification shown with ID: $notificationId")
@@ -293,10 +302,19 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
+    private fun isForeground(): Boolean {
+        val appProcessInfo = ActivityManager.RunningAppProcessInfo()
+        ActivityManager.getMyMemoryState(appProcessInfo)
+
+        val importance = appProcessInfo.importance
+
+        return importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND || importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE
+    }
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         Log.d(TAG, "New FCM token: $token")
-        // TODO: Sende den neuen Token an deinen Server
+        // TODO: Send the new token to your server
         // sendTokenToServer(token)
     }
 

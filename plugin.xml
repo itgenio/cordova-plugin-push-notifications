@@ -39,7 +39,7 @@
             <string>production</string>
         </config-file>
     </platform>
-    
+
     <platform name="android">
         <config-file target="config.xml" parent="/*">
             <preference name="GradlePluginKotlinEnabled" value="true" />
@@ -56,7 +56,7 @@
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id"
                 android:value="444" />
-            <service android:name="notifications.MyFirebaseMessagingService" 
+            <service android:name="notifications.MyFirebaseMessagingService"
                 android:exported="false"
                 android:foregroundServiceType="dataSync">
                 <intent-filter>
@@ -76,7 +76,7 @@
             <!-- Target SDK 34+ -->
             <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
             <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-            
+
             <permission android:name="${applicationId}.permission.PushHandlerActivity"
                 android:protectionLevel="signature"></permission>
         </config-file>
